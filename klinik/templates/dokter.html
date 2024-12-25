@@ -1,0 +1,198 @@
+{% extends 'index.html' %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Kelola Dokter</h1>
+</div>
+<div id="Loader">
+  <div class="d-flex justify-content-center">
+    <div class="spinner-border text-danger" style="width: 10rem; height: 10rem" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDoctorModal">+Tambah
+    Dokter</button>
+
+  <div class="modal fade" id="addDoctorModal" tabindex="-1" aria-labelledby="addDoctorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="addDoctorModalLabel">Dokter Baru</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{{ url_for('tambah_dokter') }}" id="tbDokter" method="POST">
+            <div class="mb-3">
+              <label for="pegawai_id" class="form-label">Nama:</label>
+              <select class="form-select" id="pegawai_id" name="pegawai_id" required>
+                <option selected disabled value="">Pilih...</option>
+                {% for pegawai in pegawai_data %}
+                <option value="{{ pegawai.id_pegawai }}">{{ pegawai.nama }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="jadwal" class="col-form-label">Jadwal:</label>
+              <textarea class="form-control" name="jadwal" id="jadwal" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="tarif_medis" class="col-form-label">Tarif Medis:</label>
+              <input type="number" class="form-control" name="tarif_medis" id="tarif_medis" required>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+              <button type="submit" class="btn btn-primary">Tambah</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<br /><br />
+<div class="card">
+  <div class="card-header">
+    Table Dokter
+  </div>
+  <div class="card-body">
+    <table class="table table-bordered table-sm">
+      <thead class="table table-dark">
+        <tr>
+          <th scope="col">NO</th>
+          <th scope="col">Nama</th>
+          <th scope="col">Jadwal</th>
+          <th scope="col">Tarif Medis</th>
+          <th scope="col">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for dt in dokter_data %}
+        <tr>
+          <th scope="row">{{ loop.index }}</th>
+          <td>{{ dt.pegawai.nama }}</td>
+          <td>{{ dt.jadwal }}</td>
+          <td>{{ dt.tarif_medis }}</td>
+          <td>
+            <!-- Edit Button -->
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+              data-bs-target="#editDoctorModal{{ dt.id }}">Edit</button>
+
+            <!-- Edit Modal -->
+            <div class="modal fade" id="editDoctorModal{{ dt.id }}" tabindex="-1"
+              aria-labelledby="editDoctorModalLabel{{ dt.id }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="editDoctorModalLabel{{ dt.id }}">Edit Dokter</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form action="{{ url_for('edit_dokter', id=dt.id) }}" method="POST">
+                      <div class="mb-3">
+                        <label for="pegawai_id_{{ dt.id }}" class="form-label">Nama:</label>
+                        <select class="form-select" id="pegawai_id_{{ dt.id }}" name="pegawai_id" required>
+                          <option value="">Pilih...</option>
+                          {% for pegawai in pegawai_data %}
+                          <option value="{{ pegawai.id_pegawai }}" {% if pegawai.id_pegawai==dt.pegawai.id_pegawai
+                            %}selected{% endif %}>
+                            {{ pegawai.nama }}
+                          </option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label for="jadwal_{{ dt.id }}" class="col-form-label">Jadwal:</label>
+                        <textarea class="form-control" name="jadwal" id="jadwal_{{ dt.id }}"
+                          required>{{ dt.jadwal }}</textarea>
+                      </div>
+                      <div class="mb-3">
+                        <label for="tarif_medis_{{ dt.id }}" class="col-form-label">Tarif Medis:</label>
+                        <input type="number" class="form-control" name="tarif_medis" id="tarif_medis_{{ dt.id }}"
+                          value="{{ dt.tarif_medis }}" required>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hapus Form -->
+            <form action="{{ url_for('hapus_dokter', id=dt.id) }}" method="post" style="display:inline;">
+              <input type="hidden" name="id_pegawai" value="{{ dt.pegawai.id_pegawai }}">
+              <button type="submit" class="btn btn-sm btn-danger"
+                onclick="return confirm('Yakin ingin menghapus data ini?')">Hapus</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block tail %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('#tbDokter').onsubmit = async (e) => {
+    e.preventDefault();
+    const req = new XMLHttpRequest();
+    req.onload = () => {
+      try {
+        const response = JSON.parse(req.responseText);
+        if (response.success) {
+          alert("Data dokter berhasil ditambahkan!");
+          location.reload();
+        } else {
+          alert("Terjadi kesalahan saat menambahkan data dokter.");
+        }
+      } catch (error) {
+        console.error("Parsing error:", error);
+      }
+    };
+    req.onerror = () => alert("Terjadi kesalahan koneksi.");
+    const formData = new FormData(document.querySelector('#tbDokter'));
+    req.open("POST", "{{ url_for('tambahdokter') }}", true);
+    req.send(formData);
+    };
+});
+
+    // Handle Delete Doctor Forms
+    const deleteForms = document.querySelectorAll('form.delete-form');
+    if (deleteForms.length > 0) {
+      deleteForms.forEach(form => {
+        form.onsubmit = async (e) => {
+          e.preventDefault();
+          if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+            try {
+              const response = await fetch(form.action, {
+                method: 'POST'
+              });
+
+              const data = await response.json();
+              if (data.success) {
+                alert("Data berhasil dihapus!");
+                location.reload();  // Reload halaman setelah penghapusan
+              } else {
+                alert(data.message || "Ada trouble dalam proses penghapusan data.");
+              }
+            } catch (error) {
+              console.error('Error:', error);
+              alert("Terjadi kesalahan saat mengirim data.");
+            }
+          }
+        };
+      });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,339 @@
+{% extends 'index.html' %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Kelola Pendaftaran</h1>
+</div>
+<div id="Loader">
+  <div class="d-flex justify-content-center">
+    <div class="spinner-border text-danger" style="width: 10rem; height: 10rem" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>
+<div id="Loader" style="display: none;">
+  <div class="d-flex justify-content-center">
+    <div class="spinner-border text-danger" style="width: 10rem; height: 10rem" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">+Tambah
+    Pasien</button>
+
+  <!-- Modal for adding patient -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Pasien Baru</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form class="row g-3 needs-validation" action="{{ url_for('tambahdaftar') }}" id="tDaftar" method="POST"
+            novalidate>
+            <!-- Form fields -->
+            <div class="col-md-4">
+              <label for="idDaftar" class="form-label">ID Daftar</label>
+              <input type="text" class="form-control" id="idDaftar" name="id_daftar" required>
+              <div class="valid-feedback">Looks good!</div>
+            </div>
+            <div class="col-md-4">
+              <label for="nama" class="form-label">Name</label>
+              <input type="text" class="form-control" id="nama" name="nama" required>
+              <div class="valid-feedback">Looks good!</div>
+            </div>
+            <div class="col-md-4">
+              <label for="tempatLahir" class="form-label">Tempat Lahir</label>
+              <input type="text" class="form-control" id="tempatLahir" name="tl" required>
+              <div class="valid-feedback">Looks good!</div>
+            </div>
+            <div class="col-md-4">
+              <label for="tanggalLahir" class="form-label">Tanggal Lahir</label>
+              <input type="date" class="form-control" id="tanggalLahir" name="tg_lahir" required>
+            </div>
+            <div class="col-md-4">
+              <label for="jenisKelamin" class="form-label">Jenis Kelamin</label>
+              <select class="form-select" id="jenisKelamin" name="jk" required>
+                <option selected disabled value="">Pilih...</option>
+                <option value="Laki-Laki">Laki-Laki</option>
+                <option value="Perempuan">Perempuan</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="statusPernikahan" class="form-label">Status Pernikahan</label>
+              <select class="form-select" id="statusPernikahan" name="status" required>
+                <option selected disabled value="">Pilih...</option>
+                <option value="Belum Menikah">Belum Menikah</option>
+                <option value="Sudah Menikah">Sudah Menikah</option>
+                <option value="Bercerai">Bercerai</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="profesi" class="form-label">Profesi</label>
+              <input type="text" class="form-control" id="profesi" name="profesi" required>
+              <div class="invalid-feedback">Please provide a valid profession.</div>
+            </div>
+            <div class="col-12">
+              <label for="alamat" class="col-form-label">Alamat:</label>
+              <input type="text" class="form-control" id="alamat" name="alamat" required>
+            </div>
+            <input type="hidden" name="keterangan" value="Diproses">
+            <div class="col-12">
+              <label for="pegawai_id" class="form-label">Dokter</label>
+              <select class="form-select" id="pegawai_id" name="pegawai_id" required>
+                <option selected disabled value="">Pilih...</option>
+                {% for pegawai in pegawai_data %}
+                <option value="{{ pegawai.id_pegawai }}">{{ pegawai.nama }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+              <button type="submit" class="btn btn-primary">Tambah</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<br /><br />
+
+<div class="card">
+  <div class="card-header">
+    Table Pasien
+  </div>
+  <div class="card-body">
+    <table class="table table-bordered table-sm">
+      <thead class="table table-dark">
+        <tr>
+          <th scope="col">No</th>
+          <th scope="col">ID Daftar</th>
+          <th scope="col">Nama</th>
+          <th scope="col">Tempat Lahir</th>
+          <th scope="col">Tanggal Lahir</th>
+          <th scope="col">Jenis Kelamin</th>
+          <th scope="col">Status</th>
+          <th scope="col">Profesi</th>
+          <th scope="col">Alamat</th>
+          <th scope="col">Keterangan</th>
+          <th scope="col">Dokter</th>
+          <th scope="col">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if pendaftaran_data %}
+        {% for dt in pendaftaran_data %}
+        <tr>
+          <th scope="row">{{ loop.index }}</th>
+          <td>{{ dt.id_daftar }}</td>
+          <td>{{ dt.nama }}</td>
+          <td>{{ dt.tl }}</td>
+          <td>{{ dt.tg_lahir }}</td>
+          <td>{{ dt.jk }}</td>
+          <td>{{ dt.status }}</td>
+          <td>{{ dt.profesi }}</td>
+          <td>{{ dt.alamat }}</td>
+          <td>{{ dt.keterangan }}</td>
+          <td>{{ dt.pegawai.nama }}</td>
+          <td>
+            <!-- Edit Button -->
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+              data-bs-target="#editModal{{ dt.id_daftar }}">Edit</button>
+
+            <!-- Edit Modal -->
+            <div class="modal fade" id="editModal{{ dt.id_daftar }}" tabindex="-1"
+              aria-labelledby="editModalLabel{{ dt.id_daftar }}" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="editModalLabel{{ dt.id_daftar }}">Edit Pasien</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form class="row g-3 needs-validation" action="{{ url_for('editdaftar', id_daftar=dt.id_daftar) }}"
+                      id="tDaftar" method="POST">
+                      <!-- Name Field -->
+                      <div class="col-md-4">
+                        <label for="editName{{ dt.id_daftar }}" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editName{{ dt.id_daftar }}" name="nama"
+                          value="{{ dt.nama }}" required>
+                      </div>
+                      <!-- Place of Birth Field -->
+                      <div class="col-md-4">
+                        <label for="editTempatLahir{{ dt.id_daftar }}" class="form-label">Tempat Lahir</label>
+                        <input type="text" class="form-control" id="editTempatLahir{{ dt.id_daftar }}" name="tl"
+                          value="{{ dt.tl }}" required>
+                      </div>
+                      <!-- Date of Birth Field -->
+                      <div class="col-md-4">
+                        <label for="editTanggalLahir{{ dt.id_daftar }}" class="form-label">Tanggal Lahir</label>
+                        <input type="date" class="form-control" id="editTanggalLahir{{ dt.id_daftar }}" name="tg_lahir"
+                          value="{{ dt.tg_lahir }}" required>
+                      </div>
+                      <!-- Gender Field -->
+                      <div class="col-md-4">
+                        <label for="editJenisKelamin{{ dt.id_daftar }}" class="form-label">Jenis Kelamin</label>
+                        <select class="form-select" id="editJenisKelamin{{ dt.id_daftar }}" name="jk" required>
+                          <option value="Laki-Laki" {% if dt.jk=='Laki-Laki' %}selected{% endif %}>Laki-Laki</option>
+                          <option value="Perempuan" {% if dt.jk=='Perempuan' %}selected{% endif %}>Perempuan</option>
+                        </select>
+                      </div>
+                      <!-- Marital Status Field -->
+                      <div class="col-md-4">
+                        <label for="editStatusPernikahan{{ dt.id_daftar }}" class="form-label">Status Pernikahan</label>
+                        <select class="form-select" id="editStatusPernikahan{{ dt.id_daftar }}" name="status" required>
+                          <option value="Belum Menikah" {% if dt.status=='Belum Menikah' %}selected{% endif %}>Belum
+                            Menikah</option>
+                          <option value="Sudah Menikah" {% if dt.status=='Sudah Menikah' %}selected{% endif %}>Sudah
+                            Menikah</option>
+                          <option value="Bercerai" {% if dt.status=='Bercerai' %}selected{% endif %}>Bercerai</option>
+                        </select>
+                      </div>
+                      <!-- Profession Field -->
+                      <div class="col-md-4">
+                        <label for="editProfesi{{ dt.id_daftar }}" class="form-label">Profesi</label>
+                        <input type="text" class="form-control" id="editProfesi{{ dt.id_daftar }}" name="profesi"
+                          value="{{ dt.profesi }}" required>
+                      </div>
+                      <!-- Address Field -->
+                      <div class="col-12">
+                        <label for="editAlamat{{ dt.id_daftar }}" class="form-label">Alamat</label>
+                        <input type="text" class="form-control" id="editAlamat{{ dt.id_daftar }}" name="alamat"
+                          value="{{ dt.alamat }}" required>
+                      </div>
+                      <!-- Employee Field -->
+                      <div class="col-md-4">
+                        <label for="pegawai_id" class="form-label">Dokter</label>
+                        <select class="form-select" id="pegawai_id" name="pegawai_id" required>
+                          <option selected disabled value="">Pilih...</option>
+                          {% for pegawai in pegawai_data %}
+                          <option value="{{ pegawai.id_pegawai }}" {% if dt.id_pegawai==pegawai.id_pegawai %}selected{%
+                            endif %}>{{ pegawai.nama }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <!-- Hidden Field for Keterangan -->
+                      <input type="hidden" name="keterangan" value="Diproses">
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delete Button -->
+            <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+              data-bs-target="#deleteModal{{ dt.id_daftar }}">Hapus</button>
+
+            <!-- Delete Modal -->
+            <div class="modal fade" id="deleteModal{{ dt.id_daftar }}" tabindex="-1"
+              aria-labelledby="deleteModalLabel{{ dt.id_daftar }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteModalLabel{{ dt.id_daftar }}">Hapus Pasien</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Apakah Anda yakin ingin menghapus pasien {{ dt.nama }}?
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <form action="{{ url_for('hapuspendaftaran', id=dt.id_daftar) }}" method="POST">
+                      <button type="submit" class="btn btn-danger">Hapus</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+          <td colspan="12" class="text-center">Tidak ada data pendaftaran</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block tail %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('#tDaftar').onsubmit = async (e) => {
+      e.preventDefault();
+      const req = new XMLHttpRequest();
+      req.onload = () => {
+        console.log(req.responseText); // Debugging
+        try {
+          const data = JSON.parse(req.responseText);
+          if (data.success) {
+            alert("Data berhasil ditambahkan!");
+            location.reload();
+          } else {
+            alert("Ada trouble");
+          }
+        } catch (error) {
+          console.error("Parsing error:", error);
+        }
+      };
+      req.onerror = () => {
+        alert("Request error");
+      };
+      const form = document.querySelector("#Daftar");
+      const datanya = new FormData(form);
+      req.open("POST", "{{ url_for('tambahdaftar') }}", true);
+      req.send(datanya);
+    };
+
+    {% for dt in data %}
+    document.querySelector(`#editDaftar{{ dt.id }}`).onsubmit = async (e) => {
+      e.preventDefault();
+      const req = new XMLHttpRequest();
+      req.onload = () => {
+        console.log("Response Data for edit:", req.responseText); // Debugging output
+        const data = JSON.parse(req.responseText);
+        if (data.success) {
+          alert("Data berhasil diupdate!");
+          location.reload();
+        } else {
+          alert("Ada trouble");
+        }
+      };
+      req.onerror = () => {
+        alert("Request error");
+      };
+      const form = document.querySelector(`#editDaftar{{ dt.id }}`);
+      const datanya = new FormData(form);
+      console.log("Sending data for edit:", datanya); // Debugging output
+      req.open("POST", "{{ url_for('editdaftar', id=dt.id) }}", true);
+      req.send(datanya);
+    };
+    {% endfor %}
+
+    // Add an event listener for delete buttons
+    document.querySelectorAll('[data-bs-target^="#exampleModal2"]').forEach(button => {
+      button.addEventListener('click', () => {
+        const url = button.getAttribute('data-href');
+        document.querySelector('#exampleModal2 .btn-danger').setAttribute('href', url);
+      });
+    });
+  });
+</script>
+{% endblock %}

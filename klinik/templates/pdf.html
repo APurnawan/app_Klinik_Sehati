@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <title>Laporan Pasien</title>
+  </head>
+  <body>
+    <h1>Laporan Pasien</h1>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">Nama</th>
+            <th scope="col">Diagnosa</th>
+            <th scope="col">Dokter</th>
+            <th scope="col">Tanggal Priksa</th>            
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in datanya %}
+          <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{d.nama}}</td>
+            <td>{{d.diagnosa}}</td>
+            <td>{{d.user.username}}</td>
+            <td>{{d.tanggal}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+  </body>
+</html>

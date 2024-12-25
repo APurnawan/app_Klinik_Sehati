@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Meta tags and other head content -->
+  <script src="static/js/feather.min.js"></script>
+  <style>
+    .nav-link span[data-feather] {
+      width: 16px;
+      height: 16px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Your existing sidebar code here -->
+  <div class="col-md-3 col-lg-2 d-md-block bg-success sidebar collapse" id="sidebarMenu">
+    <div class="position-sticky pt-3">
+      <ul class="nav flex-column">
+        {% if session.level == 'Admin' %}
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/dashboard">
+            <span data-feather="home"></span>
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="pegawai">
+            <span data-feather="users"></span>
+            Pegawai
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/dokter">
+            <span data-feather="users"></span>
+            Dokter
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="kelola_user">
+            <span data-feather="users"></span>
+            Kelola User
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/pendaftaran">
+            <span data-feather="file"></span>
+            Pendaftaran Pasien
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/apotik">
+            <span data-feather="shopping-cart"></span>
+            Apotek
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="suplier">
+            <span data-feather="bar-chart-2"></span>
+            Suplier
+          </a>
+        </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="biayaadministrasi">
+          <span data-feather="credit-card"></span>
+          Biaya Administrasi
+        </a>
+      </li>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="pembayaran">
+            <span data-feather="credit-card"></span>
+            Pembayaran
+          </a>
+        </li>
+        {% elif session.level == 'Dokter' %}
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">
+            <span data-feather="home"></span>
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/tangani_pasien">
+            <span data-feather="file"></span>
+            Penanganan Pasien
+          </a>
+        </li>
+        {% elif session.level == 'Administrasi'%}
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">
+            <span data-feather="home"></span>
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/pendaftaran">
+            <span data-feather="file"></span>
+            Pendaftaran Pasien
+          </a>
+        </li>
+        {% elif session.level == 'Apoteker' %}
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">
+            <span data-feather="home"></span>
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/apotik">
+            <span data-feather="file"></span>
+            Apotik
+          </a>
+        </li>  
+        <li class="nav-item">
+          <a class="nav-link active" href="/suplier">
+            <span data-feather="file"></span>
+            Suplier
+          </a>
+        </li> 
+        <li class="nav-item">
+          <a class="nav-link active" href="/detail_obat">
+            <span data-feather="file"></span>
+            Detail Obat
+          </a>
+        </li> 
+        <li class="nav-item">
+          <a class="nav-link active" href="/biaya_obat">
+            <span data-feather="file"></span>
+            Bayar Obat
+          </a>
+        </li> 
+        {% elif session.level == 'Kasir' %}
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">
+            <span data-feather="home"></span>
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="/biayaadministrasi">
+            <span data-feather="file"></span>
+            Biaya Administrasi
+          </a>
+        </li> 
+        <li class="nav-item">
+          <a class="nav-link active" href="/dokter">
+            <span data-feather="file"></span>
+            Dokter
+          </a>
+        </li>  
+        <li class="nav-item">
+          <a class="nav-link active" href="/pembayaran">
+            <span data-feather="file"></span>
+            Pembayaran
+          </a>
+        </li> 
+        {% endif %}
+      </ul>
+
+      <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+        <span>Saved reports</span>
+        <a class="link-secondary" href="#" aria-label="Add a new report">
+          <span data-feather="plus-circle"></span>
+        </a>
+      </h6>
+        <li class="nav-item">
+          <a class="nav-link active" href="/pencarian">
+            <span data-feather="file-text"></span>
+            Laporan Pasien
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Feather Icons initialization script -->
+  <script>
+    feather.replace()
+  </script>
+</body>
+</html>

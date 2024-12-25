@@ -1,0 +1,259 @@
+{% extends 'index.html' %}
+
+{% block sidebar %}
+<!-- Your sidebar content -->
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Kelola Apotik</h1>
+</div>
+<div id="Loader">
+    <div class="d-flex justify-content-center">
+      <div class="spinner-border text-danger" style="width: 10rem; height: 10rem" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+</div>
+<div class="container">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">+Tambah Obat</button>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="addModalLabel">Obat Baru</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('tambahobat') }}" id="addObatForm" method="POST">
+          <div class="mb-4">
+            <label for="namaObat" class="col-form-label">Nama Obat:</label>
+            <input type="text" name="namaObat" class="form-control" id="namaObat">
+          </div>
+          <div class="mb-4">
+            <label for="jenisObat" class="form-label">Jenis Obat</label>
+            <select class="form-select" id="jenisObat" name="jenisObat" required>
+              <option selected disabled value="">Pilih...</option>
+              <option value="Psitropika">Psitropika</option>
+              <option value="Paten">Paten</option>
+              <option value="Racikan">Racikan</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="harga_beli" class="col-form-label">Harga Beli:</label>
+            <input type="number" class="form-control" name="harga_beli" id="harga_beli">
+          </div>
+          <div class="mb-3">
+            <label for="harga_jual" class="col-form-label">Harga Jual:</label>
+            <input type="number" class="form-control" name="harga_jual" id="harga_jual">
+          </div>
+          <input type= "hidden" name="kondisi" value="Baik">
+          <div class="mb-3">
+            <label for="suplier_id" class="form-label">Supplier:</label>
+            <select class="form-select" id="suplier_id" name="suplier_id" required>
+              <option selected disabled value="">Pilih...</option>
+              {% for d1 in data1 %}
+              <option value="{{ d1.id }}">{{ d1.perusahaan }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            <button type="submit" class="btn btn-primary">Tambah</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<br /><br />
+<div class="card">
+  <div class="card-header">
+    Table Obat
+  </div>
+  <div class="card-body">
+    <table class="table table-bordered table-sm">
+      <thead class="table table-dark">
+        <tr>
+          <th scope="col">No</th>
+          <th scope="col">Nama Obat</th>
+          <th scope="col">Jenis Obat</th>
+          <th scope="col">Harga Beli</th>
+          <th scope="col">Harga Jual</th>
+          <th scope="col">Suplier</th>
+          <th scope="col">Aksi</th>                             
+        </tr>
+      </thead>
+      <tbody>
+        {% for dt in data %}
+        <tr>
+          <th scope="row">{{ loop.index }}</th>
+          <td>{{ dt.namaObat }}</td>
+          <td>{{ dt.jenisObat }}</td>
+          <td>{{ dt.harga_beli }}</td>
+          <td>{{ dt.harga_jual }}</td>
+          <td>{{ dt.suplier.perusahaan }}</td>
+          <td>
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ dt.id }}">Edit</button>
+            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ dt.id }}">Hapus</button>
+          </td>
+        </tr>
+
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editModal{{ dt.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ dt.id }}" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="editModalLabel{{ dt.id }}">Edit Obat</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form action="{{ url_for('editobat', id=dt.id) }}" id="editObatForm{{ dt.id }}" method="POST">
+                  <div class="mb-3">
+                    <label for="editNamaObat{{ dt.id }}" class="col-form-label">Nama Obat:</label>
+                    <input type="text" class="form-control" name="namaObat" id="editNamaObat{{ dt.id }}" value="{{ dt.namaObat }}" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="editJenisObat{{ dt.id }}" class="form-label">Jenis Obat</label>
+                    <select class="form-select" name="jenisObat" id="editJenisObat{{ dt.id }}" required>
+                      <option selected disabled value="">Pilih...</option>
+                      <option value="Psitropika" {% if dt.jenisObat == 'Psitropika' %}selected{% endif %}>Psitropika</option>
+                      <option value="Paten" {% if dt.jenisObat == 'Paten' %}selected{% endif %}>Paten</option>
+                      <option value="Racikan" {% if dt.jenisObat == 'Racikan' %}selected{% endif %}>Racikan</option>
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label for="editHargaBeli{{ dt.id }}" class="col-form-label">Harga Beli:</label>
+                    <input type="number" class="form-control" name="harga_beli" id="editHargaBeli{{ dt.id }}" value="{{ dt.harga_beli }}" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="editHargaJual{{ dt.id }}" class="col-form-label">Harga Jual:</label>
+                    <input type="number" class="form-control" name="harga_jual" id="editHargaJual{{ dt.id }}" value="{{ dt.harga_jual }}" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="suplier_id" class="form-label">Kondisi Obat:</label>
+                    <select class="form-select" id="suplier_id" name="kondisi" required>
+                      <option selected disabled value="">Pilih...</option>
+                      <option value="Baik">Baik</option>
+                      <option value="Rusak">Rusak</option>                      
+                    </select>
+                  </div>
+                  <div class="mb-3">
+                    <label for="editSuplierId{{ dt.id }}" class="col-form-label">Supplier:</label>
+                    <select class="form-select" name="suplier_id" id="editSuplierId{{ dt.id }}" required>
+                      <option selected disabled value="">Pilih...</option>
+                      {% for d1 in data1 %}
+                      <option value="{{ d1.id }}" {% if d1.id == dt.suplier_id %}selected{% endif %}>{{ d1.perusahaan }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delete Modal -->
+        <div class="modal fade" id="deleteModal{{ dt.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ dt.id }}" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel{{ dt.id }}">Konfirmasi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Apakah Anda yakin ingin menghapus obat ini?
+              </div>
+              <div class="modal-footer">
+                <form action="{{ url_for('hapusobat', id=dt.id) }}" method="POST">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                  <button type="submit" class="btn btn-danger">Hapus</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% block tail %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('#Obat').onsubmit = async (e) => {
+    e.preventDefault();
+    const req = new XMLHttpRequest();
+    req.onload = () => {
+      console.log("Response for tambahobat:", req.responseText); // Debugging
+      try {
+        const data = JSON.parse(req.responseText);
+        if (data.success) {
+          alert("Data berhasil ditambahkan!");
+          location.reload();
+        } else {
+          alert("Ada trouble");
+        }
+      } catch (error) {
+        console.error("Parsing error:", error);
+      }
+    };
+    req.onerror = () => {
+      alert("Request error");
+    };
+    const form = document.querySelector("#Obat");
+    const datanya = new FormData(form);
+    console.log("Form Data for tambahobat:", datanya); // Debugging
+    req.open("POST", "{{ url_for('tambahobat') }}", true);
+    req.send(datanya);
+  };
+
+  {% for dt in data %}
+  document.querySelector("#editObt{{ dt.id }}").onsubmit = async (e) => {
+    e.preventDefault();
+    const req = new XMLHttpRequest();
+    req.onload = () => {
+      console.log("Response Data for edit:", req.responseText); // Debugging
+      try {
+        const data = JSON.parse(req.responseText);
+        if (data.success) {
+          alert("Data berhasil diupdate!");
+          location.reload();
+        } else {
+          alert("Ada trouble");
+        }
+      } catch (error) {
+        console.error("Parsing error:", error);
+      }
+    };
+    req.onerror = () => {
+      alert("Request error");
+    };
+    const form = document.querySelector("#editObt{{ dt.id }}");
+    const datanya = new FormData(form);
+    console.log("Form Data for edit:", datanya); // Debugging
+    req.open("POST", `/editobat/${dt.id}`, true);
+    req.send(datanya);
+  };
+  {% endfor %}
+  
+  // Add an event listener for delete buttons
+  document.querySelectorAll('[data-bs-target^="#exampleModal2"]').forEach(button => {
+    button.addEventListener('click', () => {
+      const url = button.getAttribute('data-href');
+      document.querySelector('#exampleModal2 .btn-danger').setAttribute('href', url);
+    });
+  });
+});
+</script>
+{% endblock %}
+{% endblock %}

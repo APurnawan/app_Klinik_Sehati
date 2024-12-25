@@ -1,0 +1,322 @@
+{% extends 'index.html' %}
+
+{% block sidebar %}
+<!-- Your sidebar content -->
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Pembayaran</h1>
+</div>
+<div id="Loader">
+  <div class="d-flex justify-content-center">
+    <div class="spinner-border text-danger" style="width: 10rem; height: 10rem" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>
+<div id="Loader" style="display: none;">
+  <div class="d-flex justify-content-center">
+    <div class="spinner-border text-danger" style="width: 10rem; height: 10rem" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">+ Tambah
+    Pembayaran</button>
+
+  <!-- Add Modal -->
+  <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="addModalLabel">Pembayaran Baru</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form class="row g-3 needs-validation" action="{{ url_for('tambah_pembayaran') }}" id="tBayar" method="POST"
+            novalidate>
+            <div class="col-md-4">
+              <label for="idBayar" class="form-label">ID Pembayaran</label>
+              <input type="text" class="form-control" id="id_bmedis" name="id_bmedis" required>
+              <div class="valid-feedback">Looks good!</div>
+            </div>
+            <div class="mb-3">
+              <label for="id_daftar" class="form-label">Nama:</label>
+              <select class="form-select" id="id_daftar" name="id_daftar" required>
+                <option selected disabled value="">Pilih...</option>
+                {% for p in pasien %}
+                <option value="{{ p.id_daftar }}">{{ p.nama }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-4">
+              <label for="tanggalPembayaran" class="form-label">Tanggal Pembayaran:</label>
+              <input type="date" name="tanggalPembayaran" class="form-control" id="tanggalPembayaran" required>
+            </div>
+            <div class="mb-3">
+              <label for="admin_id" class="form-label">Biaya Administrasi:</label>
+              <select class="form-select" id="admin_id" name="admin_id" required>
+                <option selected disabled value="">Pilih...</option>
+                {% for admin in admin_data %}
+                <option value="{{ admin.id }}">{{ admin.biaya }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="dokter_id" class="form-label">Jasa Dokter:</label>
+              <select class="form-select" id="dokter_id" name="dokter_id" required>
+                <option selected disabled value="">Pilih...</option>
+                {% for dokter in dokter_data %}
+                <option value="{{ dokter.id }}">{{ dokter.tarif_medis }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="total_bayar" class="form-label">Total Bayar:</label>
+              <input type="text" class="form-control" id="total_bayar" readonly>
+            </div>
+            <!-- Total Bayar Dihitung di Backend -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+              <button type="submit" class="btn btn-primary">Tambah</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br /><br />
+
+  <div class="card">
+    <div class="card-header">
+      Tabel Pembayaran
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-sm">
+        <thead class="table table-dark">
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">ID Pembayaran</th>
+            <th scope="col">Nama</th>
+            <th scope="col">Tanggal Pembayaran</th>
+            <th scope="col">Biaya Administrasi</th>
+            <th scope="col">Jasa Dokter</th>
+            <th scope="col">Total Bayar</th>
+            <th scope="col">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pembayaran in pembayaran_list %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ pembayaran.id_bmedis }}</td>
+            <td>{{ pembayaran.pendaftaran.nama }}</td>
+            <td>{{ pembayaran.tanggal_bayar }}</td>
+            <td>{{ pembayaran.biaya_admin_ref.biaya }}</td>
+            <td>{{ pembayaran.jasa_dokter_ref.tarif_medis if pembayaran.jasa_dokter_ref else 'N/A' }}</td>
+            <td>{{ (pembayaran.biaya_admin_ref.biaya | decimal) + (pembayaran.jasa_dokter_ref.tarif_medis | decimal) }}
+            </td>
+            <td>
+              <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                data-bs-target="#editModal{{ pembayaran.id_bmedis }}">Edit</button>
+              <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                data-bs-target="#deleteModal{{ pembayaran.id_bmedis }}">Hapus</button>
+            </td>
+          </tr>
+
+          <!-- Edit Modal -->
+          <div class="modal fade" id="editModal{{ pembayaran.id_bmedis }}" tabindex="-1"
+            aria-labelledby="editModalLabel{{ pembayaran.id_bmedis }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="editModalLabel{{ pembayaran.id_bmedis }}">Edit Pembayaran</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form class="row g-3 needs-validation"
+                    action="{{ url_for('edit_pembayaran', id_bmedis=pembayaran.id_bmedis) }}" method="POST" novalidate>
+                    <div class="col-md-4">
+                      <label for="idBayar{{ pembayaran.id_bmedis }}" class="form-label">ID Pembayaran</label>
+                      <input type="text" class="form-control" id="idBayar{{ pembayaran.id_bmedis }}" name="id_bmedis"
+                        value="{{ pembayaran.id_bmedis }}" required readonly>
+                    </div>
+                    <div class="mb-3">
+                      <label for="id_daftar{{ pembayaran.id_bmedis }}" class="form-label">Nama:</label>
+                      <select class="form-select" id="id_daftar{{ pembayaran.id_bmedis }}" name="id_daftar" required>
+                        <option disabled value="">Pilih...</option>
+                        {% for p in pasien %}
+                        <option value="{{ p.id_daftar }}" {% if p.id_daftar==pembayaran.pendaftaran.id_daftar
+                          %}selected{% endif %}>{{ p.nama }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="mb-4">
+                      <label for="tanggalPembayaran{{ pembayaran.id_bmedis }}" class="form-label">Tanggal
+                        Pembayaran:</label>
+                      <input type="date" name="tanggalPembayaran" class="form-control"
+                        id="tanggalPembayaran{{ pembayaran.id_bmedis }}" value="{{ pembayaran.tanggal_bayar }}"
+                        required>
+                    </div>
+                    <div class="mb-3">
+                      <label for="admin_id{{ pembayaran.id_bmedis }}" class="form-label">Biaya Administrasi:</label>
+                      <select class="form-select" id="admin_id{{ pembayaran.id_bmedis }}" name="admin_id" required>
+                        <option disabled value="">Pilih...</option>
+                        {% for admin in admin_data %}
+                        <option value="{{ admin.id }}" {% if admin.id==pembayaran.biaya_admin_ref.id %}selected{% endif
+                          %}>{{ admin.biaya }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label for="dokter_id{{ pembayaran.id_bmedis }}" class="form-label">Jasa Dokter:</label>
+                      <select class="form-select" id="dokter_id{{ pembayaran.id_bmedis }}" name="dokter_id" required>
+                        <option disabled value="">Pilih...</option>
+                        {% for dokter in dokter_data %}
+                        <option value="{{ dokter.id }}" {% if dokter.id==pembayaran.jasa_dokter_ref.id %}selected{%
+                          endif %}>{{ dokter.tarif_medis }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label for="total_bayar{{ pembayaran.id_bmedis }}" class="form-label">Total Bayar:</label>
+                      <input type="text" class="form-control" id="total_bayar{{ pembayaran.id_bmedis }}" readonly>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                      <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delete Modal -->
+          <div class="modal fade" id="deleteModal{{ pembayaran.id_bmedis }}" tabindex="-1"
+            aria-labelledby="deleteModalLabel{{ pembayaran.id_bmedis }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="deleteModalLabel{{ pembayaran.id_bmedis }}">Hapus Pembayaran</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <p>Apakah Anda yakin ingin menghapus pembayaran ini?</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                  <a href="{{ url_for('delete_pembayaran', id_bmedis=pembayaran.id_bmedis) }}"
+                    class="btn btn-danger">Hapus</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+{% block tail %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Fungsi untuk menghitung total biaya
+    function hitungTotal() {
+      // Ambil nilai dari Biaya Administrasi dan Jasa Dokter
+      const adminBiaya = parseFloat(document.getElementById('admin_id').value) || 0;
+      const jasaDokter = parseFloat(document.getElementById('dokter_id').value) || 0;
+
+      // Hitung total bayar
+      const totalBayar = adminBiaya + jasaDokter;
+
+      // Tampilkan hasil ke kolom Total Bayar
+      document.getElementById('total_bayar').value = totalBayar.toFixed(2); // rounding to 2 decimal places for better formatting
+    }
+
+    // Optionally, bind the function to some event, for example, whenever inputs change
+    document.getElementById('admin_id').addEventListener('input', hitungTotal);
+    document.getElementById('dokter_id').addEventListener('input', hitungTotal);
+
+    // Call the function initially to populate the value if there are default values
+    hitungTotal();
+  });
+
+  <script>
+  document.querySelector('#tBayar').onsubmit = async (e) => {
+      e.preventDefault();
+    const form = document.querySelector("#tBayar");
+    const formData = new FormData(form);
+
+    // Debug: Log form data before sending
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
+    const req = new XMLHttpRequest();
+    req.onload = () => {
+        try {
+            const data = JSON.parse(req.responseText);
+    if (data.success) {
+      alert(data.message);
+    location.reload();
+            } else {
+      alert(data.message);
+            }
+        } catch (error) {
+      console.error("Parsing error:", error);
+    alert("An unexpected error occurred.");
+        }
+    };
+
+    req.open("POST", "{{ url_for('tambah_pembayaran') }}", true);
+    req.send(formData);
+};
+
+    {% for dt in pembayaran_list %}
+    document.querySelector("#editbayar{{ dt.id_bmedis }}").onsubmit = async (e) => {
+      e.preventDefault();
+    const req = new XMLHttpRequest();
+    req.onload = () => {
+      console.log("Response Data for edit:", req.responseText); // Debugging
+    try {
+        const data = JSON.parse(req.responseText);
+    if (data.success) {
+      alert("Data berhasil diupdate!");
+    location.reload();
+        } else {
+      alert("Ada trouble");
+        }
+      } catch (error) {
+      console.error("Parsing error:", error);
+      }
+    };
+    req.onerror = () => {
+      alert("Request error");
+    };
+    const form = document.querySelector("#editbayar{{ dt.id_bmedis }}");
+    const datanya = new FormData(form);
+    console.log("Form Data for edit:", datanya); // Debugging
+    req.open("POST", `/editbayar/${dt.id}`, true);
+    req.send(datanya);
+  };
+  {% endfor %}
+  
+  // Add an event listener for delete buttons
+  document.querySelectorAll('[data-bs-target^="#exampleModal2"]').forEach(button => {
+    button.addEventListener('click', () => {
+      const url = button.getAttribute('data-href');
+      document.querySelector('#exampleModal2 .btn-danger').setAttribute('href', url);
+    });
+  });
+});
+</script>
+{% endblock %}
+{% endblock %}

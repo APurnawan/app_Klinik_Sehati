@@ -1,0 +1,161 @@
+{% extends 'index.html' %}
+
+{% block sidebar %}
+{% endblock %}
+
+{% block content %}
+<head>
+  <!-- Meta tags and other head content -->
+  <script src="{{ url_for('static', filename='js/feather.min.js') }}"></script>
+</head>
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Dashboard</h1>
+</div>
+
+<div id="Loader">
+  <div class="d-flex justify-content-center">
+    <div class="spinner-border text-danger" style="width: 10rem; height: 10rem" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>
+
+{% if session.level == 'Admin' %}
+<div class="row row-cols-1 row-cols-md-2 g-4">
+  <!-- Cards untuk data -->
+  <div class="col-lg-3 lg-6">
+    <div class="card text-bg-info mb-3" style="max-width: 18rem;">
+      <div class="card-body">
+        <i class="feather-64" data-feather="users"></i>
+        <h5 class="card-title">Dokter</h5>
+        <h6>{{data1}}</h6>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 lg-6">
+    <div class="card text-bg-primary mb-3" style="max-width: 18rem;">
+      <div class="card-body">
+        <i class="feather-64" data-feather="user-plus"></i>
+        <h5 class="card-title">Jumlah Pasien</h5>
+        <h6>{{data2}}</h6>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 lg-6">
+    <div class="card text-bg-warning mb-3" style="max-width: 18rem;">
+      <div class="card-body">
+        <i class="feather-64" data-feather="thumbs-down"></i>
+        <h5 class="card-title">Kerugian Apotik</h5>
+        <h6>{{"Rp.{:,}".format(data4)}}</h6>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-3 lg-6">
+    <div class="card text-bg-danger mb-3" style="max-width: 18rem;">
+      <div class="card-body">
+        <i class="feather-64" data-feather="smile"></i>
+        <h5 class="card-title">Jumlah User</h5>
+        <h6>{{data3}}</h6>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Highcharts -->
+<figure class="highcharts-figure">
+  <div id="container"></div> <!-- Ini adalah elemen yang digunakan oleh Highcharts -->
+  <p class="highcharts-description">
+  </p>
+</figure>
+{% elif session.level == 'Dokter' %}
+<main class="container">
+  <div class="bg-body-tertiary p-5 rounded">
+    <h1>Welcome</h1>
+    <p class="lead">Selamat Datang Dokter</p>
+    <a class="btn btn-lg btn-primary" href="/" role="button">Lihat Pasien &raquo;</a>
+  </div>
+</main>
+
+{% elif session.level == 'Administrasi' %} 
+<main class="container">
+  <div class="bg-body-tertiary p-5 rounded">
+    <h1>Welcome</h1>
+    <p class="lead">Selamat Datang di Laman Administrasi</p>
+    <a class="btn btn-lg btn-primary" href="/" role="button">Lihat Pasien &raquo;</a>
+  </div>
+</main>
+
+{% elif session.level == 'Apoteker' %} 
+<main class="container">
+  <div class="bg-body-tertiary p-5 rounded">
+    <h1>Welcome</h1>
+    <p class="lead">Selamat Datang di Laman Apotik</p>
+    <a class="btn btn-lg btn-primary" href="/" role="button">Lihat Apotik &raquo;</a>
+  </div>
+</main>
+
+{% elif session.level == 'Kasir' %} 
+<main class="container">
+  <div class="bg-body-tertiary p-5 rounded">
+    <h1>Welcome</h1>
+    <p class="lead">Selamat Datang di Laman Kasir</p>
+    <a class="btn btn-lg btn-primary" href="/" role="button">Lihat Kasir &raquo;</a>
+  </div>
+</main>
+
+{% endif %}
+
+{% block tail %}
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/export-data.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      Highcharts.chart('container', {
+          chart: {
+              plotBackgroundColor: null,
+              plotBorderWidth: null,
+              plotShadow: false,
+              type: 'pie'
+          },
+          title: {
+              text: 'Kondisi Grafik Profit & Kerugian Penjualan Obat',
+              align: 'center'
+          },
+          tooltip: {
+              pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+          },
+          accessibility: {
+              point: {
+                  valueSuffix: '%'
+              }
+          },
+          plotOptions: {
+              pie: {
+                  allowPointSelect: true,
+                  cursor: 'pointer',
+                  dataLabels: {
+                      enabled: true,
+                      format: '<span style="font-size: 1.2em"><b>{point.name}</b></span><br>' +
+                              '<span style="opacity: 0.6">{point.percentage:.1f}%</span>',
+                      connectorColor: 'rgba(128,128,128,0.5)'
+                  }
+              }
+          },
+          series: [{
+              name: 'Share',
+              data: [
+                  { name: 'Profit', y: {{ data5 }} },
+                  { name: 'Kerugian', y: {{ data4 }} }
+              ]
+          }]
+      });
+    });
+  </script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,250 @@
+{% extends 'index.html' %}
+
+{% block sidebar %}
+<!-- Your sidebar content -->
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Kelola Pegawai</h1>
+</div>
+<div id="Loader">
+    <div class="d-flex justify-content-center">
+      <div class="spinner-border text-danger" style="width: 10rem; height: 10rem" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+</div>
+<div class="container">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">+Tambah Pegawai</button>
+
+    <!-- Add Modal -->
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="addModalLabel">Pegawai Baru</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="{{ url_for('tambahpegawai') }}" id="addPegawaiForm" method="POST">
+              <div class="mb-4">
+                <label for="id_pegawai" class="col-form-label">Id Pegawai:</label>
+                <input type="text" name="id_pegawai" class="form-control" id="id_pegawai" required>
+              </div>
+              <div class="mb-4">
+                <label for="nama" class="col-form-label">Nama:</label>
+                <input type="text" name="nama" class="form-control" id="nama" required>
+              </div>
+              <div class="mb-3">
+                <label for="alamat" class="col-form-label">Alamat:</label>
+                <input type="text" class="form-control" name="alamat" id="alamat" required>
+              </div>
+              <div class="mb-3">
+                <label for="no_hp" class="col-form-label">No HP:</label>
+                <input type="text" class="form-control" name="no_hp" id="no_hp" required>
+              </div>
+              <div class="mb-4">
+                <label for="jabatan" class="form-label">Jabatan</label>
+                <input type="text" name="jabatan" class="form-control" id="jabatan" required>
+              </div>
+              <div class="mb-4">
+                <label for="spesialisasi" class="form-label">Spesialisasi</label>
+                <select class="form-select" id="spesialisasi" name="spesialisasi" required>
+                  <option selected disabled value="">Pilih...</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Kasir">Kasir</option>                  
+                  <option value="Dokter Umum">Dokter Umum</option>
+                  <option value="Dokter Anak">Dokter Anak</option>
+                  <option value="Apoteker">Apoteker</option>
+                  <option value="Administrator">Administrator</option>
+                </select>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="submit" class="btn btn-primary">Tambah</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <br /><br />
+    <div class="card">
+      <div class="card-header">
+        Table Pegawai
+      </div>
+      <div class="card-body">
+        <table class="table table-bordered table-sm">
+          <thead class="table table-dark">
+            <tr>
+              <th scope="col">No</th>              
+              <th scope="col">Id Pegawai</th>
+              <th scope="col">Nama</th>
+              <th scope="col">Alamat</th>
+              <th scope="col">No HP</th>              
+              <th scope="col">Jabatan</th>
+              <th scope="col">Spesialisasi</th>
+              <th scope="col">Aksi</th>                             
+            </tr>
+          </thead>
+          <tbody>
+            {% for dt in data %}
+            <tr>
+              <th scope="row">{{ loop.index }}</th>
+              <td>{{ dt.id_pegawai}}</td>              
+              <td>{{ dt.nama}}</td>
+              <td>{{ dt.alamat }}</td>
+              <td>{{ dt.no_hp }}</td>              
+              <td>{{ dt.jabatan }}</td>  
+              <td>{{ dt.spesialisasi }}</td>           
+              <td>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ dt.id_pegawai }}">Edit</button>
+                <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ dt.id_pegawai }}">Hapus</button>
+              </td>
+            </tr>
+
+            <!-- Edit Modal -->
+            <div class="modal fade" id="editModal{{ dt.id_pegawai }}" tabindex="-1" aria-labelledby="editModalLabel{{ dt.id_pegawai }}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="editModalLabel{{ dt.id_pegawai }}">Edit Pegawai</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form action="{{ url_for('editpegawai', id_pegawai=dt.id_pegawai) }}" id="editPegawaiForm{{ dt.id_pegawai }}" method="POST">
+                      <!-- Add a hidden input field for id_pegawai -->
+                      <div class="mb-3">
+                        <label for="editid_pegawai{{ dt.id_pegawai }}" class="col-form-label">Id Pegawai:</label>
+                        <input type="text" class="form-control" name="id_pegawai" id="editid_pegawai{{ dt.id_pegawai }}" value="{{ dt.id_pegawai }}" required>
+                      </div>                      
+                 
+                      <div class="mb-3">
+                        <label for="editNama{{ dt.id_pegawai }}" class="col-form-label">Nama:</label>
+                        <input type="text" class="form-control" name="nama" id="editNama{{ dt.id_pegawai }}" value="{{ dt.nama }}" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="editAlamat{{ dt.id_pegawai }}" class="col-form-label">Alamat:</label>
+                        <input type="text" class="form-control" name="alamat" id="editAlamat{{ dt.id_pegawai }}" value="{{ dt.alamat }}" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="editno_hp{{ dt.id }}" class="form-label">No HP</label>
+                        <input type="text" class="form-control" name="no_hp" id="editJabatan{{ dt.id_pegawai }}" value="{{ dt.no_hp }}" required>
+                      </div> 
+                      <div class="mb-3">
+                        <label for="editJabatan{{ dt.id_pegawai }}" class="form-label">Jabatan</label>
+                        <input type="text" class="form-control" name="jabatan" id="editJabatan{{ dt.id_pegawai }}" value="{{ dt.jabatan }}" required>
+                      </div>   
+                      <div class="mb-4">
+                        <label for="spesialisasi" class="form-label">Spesialisasi</label>
+                        <select class="form-select" id="spesialisasi" name="spesialisasi" required>
+                          <option selected disabled value="">Pilih...</option>
+                          <option value="Admin" {% if dt.spesialisasi == 'Admin' %}selected{% endif %}>Admin</option>
+                          <option value="Kasir" {% if dt.spesialisasi == 'Kasir' %}selected{% endif %}>Kasir</option>                  
+                          <option value="Dokter Umum" {% if dt.spesialisasi == 'Dokter Umum' %}selected{% endif %}>Dokter Umum</option>
+                          <option value="Dokter Anak" {% if dt.spesialisasi == 'Dokter Anak' %}selected{% endif %}>Dokter Anak</option>
+                          <option value="Apoteker" {% if dt.spesialisasi == 'Apoteker' %}selected{% endif %}>Apoteker</option>
+                          <option value="Administrator" {% if dt.spesialisasi == 'Administrator' %}selected{% endif %}>Administrator</option>
+                        </select>
+                      </div>                   
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Delete Modal -->
+            <div class="modal fade" id="deleteModal{{ dt.id_pegawai }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ dt.id_pegawai }}" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel{{ dt.id_pegawai }}">Konfirmasi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Apakah Anda yakin ingin menghapus pegawai ini?
+                  </div>
+                  <div class="modal-footer">
+                    <form action="{{ url_for('hapuspegawai', id_pegawai=dt.id_pegawai) }}" method="POST">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                      <button type="submit" class="btn btn-danger">Hapus</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+{% endblock %}
+
+{% block tail %}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Add Pegawai Form submission
+      document.querySelector('#addPegawaiForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const req = new XMLHttpRequest();
+        req.onload = () => {
+          console.log("Response for tambahpegawai:", req.responseText); // Debugging
+          try {
+            const data = JSON.parse(req.responseText);
+            if (data.success) {
+              alert("Data berhasil ditambahkan!");
+              location.reload();
+            } else {
+              alert("Ada trouble");
+            }
+          } catch (error) {
+            console.error("Parsing error:", error);
+          }
+        };
+        req.onerror = () => {
+          alert("Request error");
+        };
+        const form = document.querySelector("#addPegawaiForm");
+        const datanya = new FormData(form);
+        req.open("POST", "{{ url_for('tambahpegawai') }}", true);
+        req.send(datanya);
+      };
+    
+      // Loop through each pegawai data and handle Edit Form submission
+      {% for dt in data %}
+      document.querySelector("#editPegawaiForm{{ dt.id_pegawai }}").onsubmit = async (e) => {
+        e.preventDefault();
+        const req = new XMLHttpRequest();
+        req.onload = () => {
+          console.log("Response Data for edit:", req.responseText); // Debugging
+          try {
+            const data = JSON.parse(req.responseText);
+            if (data.success) {
+              alert("Data berhasil diupdate!");
+              location.reload();
+            } else {
+              alert("Ada trouble");
+            }
+          } catch (error) {
+            console.error("Parsing error:", error);
+          }
+        };
+        req.onerror = () => {
+          alert("Request error");
+        };
+        const form = document.querySelector("#editPegawaiForm{{ dt.id_pegawai }}");
+        const datanya = new FormData(form);
+        req.open("POST", "{{ url_for('editpegawai', id_pegawai=dt.id_pegawai) }}", true);
+        req.send(datanya);
+      };
+      {% endfor %}
+    });
+    </script>
+{% endblock %}

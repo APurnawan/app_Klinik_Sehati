@@ -1,0 +1,305 @@
+{% extends 'index.html' %}
+
+{% block sidebar %}
+<!-- Your sidebar content -->
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Detail Obat</h1>
+</div>
+<div id="Loader">
+  <div class="d-flex justify-content-center">
+    <div class="spinner-border text-danger" style="width: 10rem; height: 10rem" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">+Tambah Detail
+    Obat</button>
+
+  <!-- Modal Tambah Detail Obat -->
+  <!-- Modal for adding patient -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Tambah Detail Obat</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form class="row g-3 needs-validation" action="{{ url_for('tambahdetailobat') }}" id="tDetailObat"
+            method="POST">
+            <!-- Form fields -->
+            <div class="col-md-4">
+              <label for="id_dobt" class="form-label">ID Dobt</label>
+              <input type="text" class="form-control" id="id_dobt" name="id_dobt" required>
+            </div>
+            <div class="col-md-4">
+              <label for="daftar_id">Pasien:</label>
+              <select name="daftar_id" id="daftar_id" class="form-control" required>
+                  <option value="" disabled selected>Pilih...</option>
+                  {% for daftar in pasiennya %}
+                  <option value="{{ daftar.id_daftar }}">{{ daftar.nama }}</option>
+                  {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="id_obat">Obat</label>
+              <select class="form-control" id="id_obat" name="id_obat" required>
+                <option selected disabled value="">Pilih...</option>
+                {% for obat in obatnya %}
+                <option value="{{ obat.id }}">{{ obat.namaObat }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="qty">Quantity</label>
+              <input type="number" class="form-control" id="qty" name="qty" required>
+            </div>
+            <div class="form-group">
+              <label for="harga">Harga</label>
+              <input type="number" class="form-control" id="harga" name="harga" required>
+            </div>
+            <div class="card-footer">
+              <h5>Total Harga: Rp {{ total_harga }}</h5>
+          </div>
+            <div class="form-group">
+              <label for="tanggal_resep">Tanggal Resep</label>
+              <input type="date" class="form-control" id="tanggal_resep" name="tanggal_resep" required>
+            </div>
+            <div class="col-12">
+              <label for="pegawai_id" class="form-label">Dokter</label>
+              <select class="form-select" id="pegawai_id" name="pegawai_id" required>
+                <option selected disabled value="">Pilih...</option>
+                {% for pegawai in pegawai %}
+                <option value="{{ pegawai.id_pegawai }}">{{ pegawai.nama }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+              <button type="submit" class="btn btn-primary">Tambah</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br /><br />
+
+  <!-- Tabel Detail Obat -->
+  <div class="card">
+    <div class="card-header">
+      Table Detail Obat
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-sm">
+        <thead class="table table-dark">
+          <tr>
+            <th>ID Dobt</th>
+            <th>Pasien</th>
+            <th>Obat</th>
+            <th>Quantity</th>
+            <th>Harga</th>
+            <th>Total</th>
+            <th>Tanggal Resep</th>
+            <th>Dokter</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for detail in data %}
+          <tr>
+            <td>{{ detail.id_dobt }}</td>
+            <td>{{ detail.pendaftaran.nama }}</td>
+            <td>{{ detail.obat.namaObat }}</td>
+            <td>{{ detail.qty }}</td>
+            <td>{{ detail.harga }}</td>
+            <td>{{ detail.total }}</td>
+            <td>{{ detail.tanggal_resep }}</td>
+            <td>{{ detail.pegawai.nama }}</td>
+            <td>
+              <!-- Tombol Edit -->
+              <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                data-bs-target="#editModal{{ detail.id_dobt }}">Edit</button>
+
+              <!-- Modal Edit Detail Obat -->
+<div class="modal fade" id="editModal{{ detail.id_dobt }}" tabindex="-1" aria-labelledby="editModalLabel{{ detail.id_dobt }}" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="editModalLabel{{ detail.id_dobt }}">Edit Detail Obat</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form class="row g-3 needs-validation" action="{{ url_for('edit_detail_obat', id_dobt=detail.id_dobt) }}" id="tDetailObat" method="POST">
+          <!-- Pasien Dropdown -->
+          <div class="col-md-4">
+            <label for="daftar_id">Pasien:</label>
+            <select name="daftar_id" id="daftar_id" class="form-control" required>
+              <option value="" disabled>Pilih...</option>
+              {% for daftar in pasiennya %}
+                <option value="{{ daftar.id_daftar }}" {% if daftar.id_daftar == detail.daftar_id %}selected{% endif %}>{{ daftar.nama }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Obat Dropdown -->
+          <div class="col-md-4">
+            <label for="id_obat">Obat:</label>
+            <select class="form-control" id="id_obat" name="id_obat" required>
+              <option value="" disabled>Pilih...</option>
+              {% for obat in obatnya %}
+                <option value="{{ obat.id }}" {% if obat.id == detail.id_obat %}selected{% endif %}>{{ obat.namaObat }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Quantity Input -->
+          <div class="form-group">
+            <label for="qty">Quantity:</label>
+            <input type="number" class="form-control" id="qty" name="qty" value="{{ detail.qty }}" required>
+          </div>
+
+          <!-- Harga Input -->
+          <div class="form-group">
+            <label for="harga">Harga:</label>
+            <input type="number" class="form-control" id="harga" name="harga" value="{{ detail.harga }}" required>
+          </div>
+
+          <!-- Tanggal Resep Input -->
+          <div class="form-group">
+            <label for="tanggal_resep">Tanggal Resep:</label>
+            <input type="date" class="form-control" id="tanggal_resep" name="tanggal_resep" value="{{ detail.tanggal_resep.strftime('%Y-%m-%d') }}" required>
+          </div>
+
+          <!-- Dokter Dropdown -->
+          <div class="col-12">
+            <label for="pegawai_id">Dokter:</label>
+            <select class="form-select" id="pegawai_id" name="pegawai_id" required>
+              <option value="" disabled>Pilih...</option>
+              {% for pegawai in pegawai %}
+                <option value="{{ pegawai.id_pegawai }}" {% if pegawai.id_pegawai == detail.pegawai_id %}selected{% endif %}>{{ pegawai.nama }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            <button type="submit" class="btn btn-primary">Update</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+              <!-- Delete Button -->
+              <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                data-bs-target="#deleteModal{{ detail.id_dobt }}">Hapus</button>
+
+              <!-- Delete Modal -->
+              <div class="modal fade" id="deleteModal{{ detail.id_dobt }}" tabindex="-1"
+                aria-labelledby="deleteModalLabel{{ detail.id_dobt }}" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="deleteModalLabel{{ detail.id_dobt }}">Hapus Pasien</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      Apakah Anda yakin ingin menghapus pasien {{ detail.nama }}?
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                      <form action="{{ url_for('hapus_detail_obat', id_dobt=detail.id_dobt) }}" method="POST">
+                        <button type="submit" class="btn btn-danger">Hapus</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endblock %}
+
+
+    {% block tail %}
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Submit form untuk tambah detail obat
+        document.querySelector('#tDetailObat').onsubmit = async (e) => {
+          e.preventDefault();
+          const req = new XMLHttpRequest();
+          req.onload = () => {
+            console.log(req.responseText); // Debugging
+            try {
+              const data = JSON.parse(req.responseText);
+              if (data.success) {
+                alert("Data berhasil ditambahkan!");
+                location.reload();
+              } else {
+                alert("Ada trouble");
+              }
+            } catch (error) {
+              console.error("Parsing error:", error);
+            }
+          };
+          req.onerror = () => {
+            alert("Request error");
+          };
+
+          // Ambil data dari form
+          const form = document.querySelector("#tDetailObat");
+          const datanya = new FormData(form);
+          console.log("Sending data:", datanya); // Debugging output
+          req.open("POST", "{{ url_for('tambahdetailobat') }}", true);
+          req.send(datanya);
+        };
+
+        // Event listener untuk setiap form edit
+        {% for dt in data %}
+        document.querySelector(`#edit_detail_obat{{ dt.id_dobt }}`).onsubmit = async (e) => {
+          e.preventDefault();
+          const req = new XMLHttpRequest();
+          req.onload = () => {
+            console.log("Response Data for edit:", req.responseText); // Debugging output
+            const data = JSON.parse(req.responseText);
+            if (data.success) {
+              alert("Data berhasil diupdate!");
+              location.reload();
+            } else {
+              alert("Ada trouble");
+            }
+          };
+          req.onerror = () => {
+            alert("Request error");
+          };
+
+          const form = document.querySelector(`#edit_detail_obat{{ dt.id_dobt }}`);
+          const datanya = new FormData(form);
+          console.log("Sending data for edit:", datanya); // Debugging output
+          req.open("POST", "{{ url_for('edit_detail_obat', id=dt.id_dobt) }}", true);
+          req.send(datanya);
+        };
+        {% endfor %}
+
+        // Event listener untuk tombol hapus
+        document.querySelectorAll('[data-bs-target^="#exampleModal2"]').forEach(button => {
+          button.addEventListener('click', () => {
+            const url = button.getAttribute('data-href');
+            document.querySelector('#exampleModal2 .btn-danger').setAttribute('href', url);
+          });
+        });
+      });
+    </script>
+    {% endblock %}

@@ -1,0 +1,202 @@
+{% extends 'index.html' %}
+
+{% block sidebar %}
+<!-- Your sidebar content -->
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+  <h1 class="h2">Biaya Administrasi</h1>
+</div>
+
+<div id="Loader" style="display: none;">
+  <div class="d-flex justify-content-center">
+    <div class="spinner-border text-danger" style="width: 10rem; height: 10rem" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">+ Tambah Biaya Administrasi</button>
+
+  <!-- Add Modal -->
+  <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="addModalLabel">Tambah Biaya Administrasi</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{{ url_for('tambahbiayaadministrasi') }}" id="addbiayaadministrasiForm" method="POST">
+            <div class="mb-4">
+              <label for="nama" class="col-form-label">Nama:</label>
+              <input type="text" name="nama" class="form-control" id="nama" required>
+            </div>
+            <div class="mb-3">
+              <label for="biaya" class="col-form-label">Biaya:</label>
+              <input type="number" class="form-control" name="biaya" id="biaya" required>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+              <button type="submit" class="btn btn-primary">Tambah</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br /><br />
+  <div class="card">
+    <div class="card-header">
+      Table Biaya Administrasi
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered table-sm">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">Nama</th>
+            <th scope="col">Biaya</th>
+            <th scope="col">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for dt in data %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ dt.nama }}</td>
+            <td>{{ dt.biaya }}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ dt.id }}">Edit</button>
+              <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ dt.id }}">Hapus</button>
+            </td>
+          </tr>
+
+          <!-- Edit Modal -->
+          <div class="modal fade" id="editModal{{ dt.id }}" tabindex="-1" aria-labelledby="editModalLabel{{ dt.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="editModalLabel{{ dt.id }}">Edit Biaya Administrasi</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form action="{{ url_for('editbiayaadministrasi', id=dt.id) }}" id="editbiayaadministrasiForm{{ dt.id }}" method="POST">
+                    <div class="mb-3">
+                      <label for="editnama{{ dt.id }}" class="col-form-label">Nama:</label>
+                      <input type="text" class="form-control" name="nama" id="editnama{{ dt.id }}" value="{{ dt.nama }}" required>
+                    </div>
+                    <div class="mb-3">
+                      <label for="editbiaya{{ dt.id }}" class="col-form-label">Biaya:</label>
+                      <input type="number" class="form-control" name="biaya" id="editbiaya{{ dt.id }}" value="{{ dt.biaya }}" required>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                      <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delete Modal -->
+          <div class="modal fade" id="deleteModal{{ dt.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ dt.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="deleteModalLabel{{ dt.id }}">Konfirmasi</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Apakah Anda yakin ingin menghapus biaya administrasi ini?
+                </div>
+                <div class="modal-footer">
+                  <form action="{{ url_for('hapusbiayaadministrasi', id=dt.id) }}" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger">Hapus</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% block tail %}
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('#Biayaadmin').onsubmit = async (e) => {
+      e.preventDefault();
+      const req = new XMLHttpRequest();
+      req.onload = () => {
+        console.log("Response for tambahbiayaadministrasi:", req.responseText); // Debugging
+        try {
+          const data = JSON.parse(req.responseText);
+          if (data.success) {
+            alert("Data berhasil ditambahkan!");
+            location.reload();
+          } else {
+            alert("Ada trouble");
+          }
+        } catch (error) {
+          console.error("Parsing error:", error);
+        }
+      };
+      req.onerror = () => {
+        alert("Request error");
+      };
+      const form = document.querySelector("#Biayaadmin");
+      const datanya = new FormData(form);
+      console.log("Form Data for tambahbiayaadministrasi:", datanya); // Debugging
+      req.open("POST", "{{ url_for('tambahbiayaadministrasi') }}", true);
+      req.send(datanya);
+    };
+  
+    {% for dt in data %}
+    document.querySelector("#editBiayaadmin{{ dt.id }}").onsubmit = async (e) => {
+      e.preventDefault();
+      const req = new XMLHttpRequest();
+      req.onload = () => {
+        console.log("Response Data for edit:", req.responseText); // Debugging
+        try {
+          const data = JSON.parse(req.responseText);
+          if (data.success) {
+            alert("Data berhasil diupdate!");
+            location.reload();
+          } else {
+            alert("Ada trouble");
+          }
+        } catch (error) {
+          console.error("Parsing error:", error);
+        }
+      };
+      req.onerror = () => {
+        alert("Request error");
+      };
+      const form = document.querySelector("#editBiayaadmin{{ dt.id }}");
+      const datanya = new FormData(form);
+      console.log("Form Data for edit:", datanya); // Debugging
+      req.open("POST", `/editbiayaadministrasi/${dt.id}`, true);
+      req.send(datanya);
+    };
+    {% endfor %}
+    
+    // Add an event listener for delete buttons
+    document.querySelectorAll('[data-bs-target^="#exampleModal2"]').forEach(button => {
+      button.addEventListener('click', () => {
+        const url = button.getAttribute('data-href');
+        document.querySelector('#exampleModal2 .btn-danger').setAttribute('href', url);
+      });
+    });
+  });
+  </script>
+  {% endblock %}
+  {% endblock %}
